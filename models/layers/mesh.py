@@ -88,11 +88,17 @@ class Mesh:
             self.nvs.append(len(e))
             self.nvsi.append(len(e) * [i])
             self.nvsin.append(list(range(len(e))))
-        self.vei = torch.from_numpy(np.concatenate(np.array(self.vei)).ravel()).to(self.device).long()
-        self.nvsi = torch.Tensor(np.concatenate(np.array(self.nvsi)).ravel()).to(self.device).long()
-        self.nvsin = torch.from_numpy(np.concatenate(np.array(self.nvsin)).ravel()).to(self.device).long()
+        #self.vei = torch.from_numpy(np.concatenate(np.array(self.vei)).ravel()).to(self.device).long()
+        #self.nvsi = torch.Tensor(np.concatenate(np.array(self.nvsi)).ravel()).to(self.device).long()
+        #self.nvsin = torch.from_numpy(np.concatenate(np.array(self.nvsin)).ravel()).to(self.device).long()
+        #ve_in = copy.deepcopy(self.ve)
+        #self.ve_in = torch.from_numpy(np.concatenate(np.array(ve_in)).ravel()).to(self.device).long()
+        self.vei = torch.from_numpy(np.concatenate(np.array(self.vei, dtype=object)).ravel()).to(self.device).long()
+        self.nvsi = torch.Tensor(np.concatenate(np.array(self.nvsi, dtype=object)).ravel()).to(self.device).long()
+        self.nvsin = torch.from_numpy(np.concatenate(np.array(self.nvsin, dtype=object)).ravel()).to(self.device).long()
         ve_in = copy.deepcopy(self.ve)
-        self.ve_in = torch.from_numpy(np.concatenate(np.array(ve_in)).ravel()).to(self.device).long()
+        self.ve_in = torch.from_numpy(np.concatenate(np.array(ve_in, dtype=object)).ravel()).to(self.device).long()
+
         self.max_nvs = max(self.nvs)
         self.nvs = torch.Tensor(self.nvs).to(self.device).float()
         self.edge2key = edge2key
@@ -295,14 +301,14 @@ class Mesh:
 
     def get_occurrences(self):
         return self.history_data['occurrences'].pop()
-    
+
     def __clean_history(self, groups, pool_mask):
         if self.history_data is not None:
             self.history_data['occurrences'].append(groups.get_occurrences())
             self.history_data['groups'].append(groups.get_groups(pool_mask))
             self.history_data['gemm_edges'].append(self.gemm_edges.copy())
             self.history_data['edges_count'].append(self.edges_count)
-    
+
     def unroll_gemm(self):
         self.history_data['gemm_edges'].pop()
         self.gemm_edges = self.history_data['gemm_edges'][-1]
